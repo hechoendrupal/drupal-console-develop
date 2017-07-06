@@ -4,7 +4,7 @@ services:
     tags:
       - { name: drupal.command, bootstrap: uninstall }
   console.develop_example_container_aware_command:
-    class: \Drupal\Console\Develop\ExampleContainerAwareCommand
+    class: \Drupal\Console\Develop\Command\ExampleContainerAwareCommand
     tags:
       - { name: drupal.command }
   console.develop_generate_doc_cheatsheet_command:
