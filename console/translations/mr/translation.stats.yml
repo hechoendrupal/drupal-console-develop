@@ -5,7 +5,7 @@ arguments:
 options:
     format: 'आउटपुट स्वरूप परिभाषित करा table|markdown'
 messages:
-    invalid-language: 'भाषा "% s" अवैध आहे.'
+    invalid-language: 'भाषा "%s" अवैध आहे.'
     language: भाषा
     percentage: टक्केवारी
     iso: 'ISO कोड'

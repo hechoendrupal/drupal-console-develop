@@ -7,7 +7,7 @@ messages:
     note: टीप
     note-description: 'Drupal Console आदेश एखाद्या Drupal 8 इन्स्टॉलेशनच्या रूटपासून चालवा.'
     command: 'Drupal Console आदेश'
-    command_description: '** "%s" ** आदेश "%s"'
+    command_description: '**"%s"** आदेश "%s"'
     usage: वापर
     options: 'उपलब्ध पर्याय'
     option: पर्याय
