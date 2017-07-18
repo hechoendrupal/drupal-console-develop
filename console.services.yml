@@ -8,20 +8,20 @@ services:
     tags:
       - { name: drupal.command }
   console.develop_generate_doc_cheatsheet_command:
-    class: \Drupal\Console\Develop\Command\GenerateDocCheatsheetCommand
+    class: \Drupal\Console\Develop\Command\DevelopDocCheatsheetCommand
     tags:
       - { name: drupal.command }
   console.develop_generate_doc_dash_command:
-    class: \Drupal\Console\Develop\Command\GenerateDocDashCommand
+    class: \Drupal\Console\Develop\Command\DevelopDocDashCommand
     arguments: ['@console.renderer', '@console.root']
     tags:
       - { name: drupal.command }
   console.develop_denerate_doc_data_command:
-    class: \Drupal\Console\Develop\Command\GenerateDocDataCommand
+    class: \Drupal\Console\Develop\Command\DevelopDocDataCommand
     tags:
       - { name: drupal.command }
   console.develop_generate_doc_gitbook_command:
-    class: \Drupal\Console\Develop\Command\GenerateDocGitbookCommand
+    class: \Drupal\Console\Develop\Command\DevelopDocGitbookCommand
     arguments: ['@console.renderer']
     tags:
       - { name: drupal.command }
