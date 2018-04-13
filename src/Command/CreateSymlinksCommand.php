@@ -10,8 +10,7 @@ namespace Drupal\Console\Develop\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
-use Drupal\Console\Core\Command\Shared\CommandTrait;
+use Drupal\Console\Core\Command\Command;
 use Drupal\Console\Core\Utils\ConfigurationManager;
 use Drupal\Console\Annotations\DrupalCommand;
 use Drupal\Console\Core\Style\DrupalStyle;
@@ -25,11 +24,8 @@ use Symfony\Component\Filesystem\Filesystem;
  *     extensionType="library"
  * )
  */
-
 class CreateSymlinksCommand extends Command
 {
-    use CommandTrait;
-
     /**
      * @var string
      */
@@ -166,8 +162,10 @@ class CreateSymlinksCommand extends Command
         $packageDirectory
     ) {
         $fileSystem = new Filesystem();
-        if ($fileSystem->exists([$projectDirectory, $packageDirectory])) {
-            $fileSystem->remove($packageDirectory);
+        if ($fileSystem->exists([$projectDirectory])) {
+            if ($fileSystem->exists([$packageDirectory])) {
+                $fileSystem->remove($packageDirectory);
+            }
             $fileSystem->symlink(
                 $projectDirectory,
                 $packageDirectory
