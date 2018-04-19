@@ -108,6 +108,11 @@ class CreateSymlinksCommand extends Command
         }
         $codeDirectory = $str = rtrim($codeDirectory, '/');
 
+        // Convert the alias for home directory into the real path i.e. ~/dev/drupal-console.
+        if (substr($codeDirectory, 0, 2) == '~/') {
+            $codeDirectory = getenv('HOME') . '/' . substr($codeDirectory, 2, strlen($codeDirectory));
+        }
+
         $io->writeln(
             $this->trans('commands.develop.create.symlinks.messages.symlink')
         );
