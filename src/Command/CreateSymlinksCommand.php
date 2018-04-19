@@ -117,8 +117,7 @@ class CreateSymlinksCommand extends Command
             $this->trans('commands.develop.create.symlinks.messages.symlink')
         );
 
-        $codePackages = $this->populatePackages($codeDirectory);
-        $this->packages = $codePackages;
+        $this->packages = $this->populatePackages($codeDirectory);
         $sitePackages = $this->populatePackages($this->consoleRoot . '/vendor/drupal');
 
         foreach ($this->packages as $name => $package) {
