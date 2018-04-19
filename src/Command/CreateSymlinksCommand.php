@@ -15,6 +15,7 @@ use Drupal\Console\Core\Utils\ConfigurationManager;
 use Drupal\Console\Annotations\DrupalCommand;
 use Drupal\Console\Core\Style\DrupalStyle;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Class CreateSymlinksCommand.
@@ -39,14 +40,7 @@ class CreateSymlinksCommand extends Command
     /**
      * @var array
      */
-    protected $packages = [
-        'drupal-console',
-        'drupal-console-core',
-        'drupal-console-extend-plugin',
-        'drupal-console-develop',
-        'drupal-console-dotenv',
-        'drupal-console-yaml'
-    ];
+    protected $packages = [];
 
     /**
      * ContributeCommand constructor.
@@ -118,37 +112,62 @@ class CreateSymlinksCommand extends Command
             $this->trans('commands.develop.create.symlinks.messages.symlink')
         );
 
-        foreach ($this->packages as $package) {
-            $projectDirectory = $codeDirectory . '/' . $package;
-            $packageDirectory = $this->consoleRoot . '/vendor/drupal/' . substr($package, 7, strlen($package));
-            $this->symlinkDirectory(
-                $io,
-                $projectDirectory,
-                $packageDirectory
-            );
+        $codePackages = $this->populatePackages($codeDirectory);
+        $this->packages = $codePackages;
+        $sitePackages = $this->populatePackages($this->consoleRoot . '/vendor/drupal');
+
+        foreach ($this->packages as $name => $package) {
+
+            $projectDirectory = $package['path'] . '/' . $package['directory'];
+            if (isset($sitePackages[$name])) {
+                $packageDirectory = $sitePackages[$name]['path'] . '/' . $sitePackages[$name]['directory'];
+
+                $this->symlinkDirectory(
+                    $io,
+                    $projectDirectory,
+                    $packageDirectory
+                );
+            }
         }
 
-        $languages = $this->configurationManager
-                ->getConfiguration()
-                ->get('application.languages');
-
-        foreach ($languages as $languageKey => $language) {
-            $projectDirectory = $codeDirectory . '/drupal-console-' . $languageKey;
-            $packageDirectory = $this->consoleRoot . '/vendor/drupal/console-' . $languageKey;
-            $this->symlinkDirectory(
-                $io,
-                $projectDirectory,
-                $packageDirectory
-            );
-        }
-
-        $autoloadDistOriginal = $codeDirectory.'/'.$this->packages[0].'/autoload.local.php.dist';
-        $autoloadDistLocal = $codeDirectory.'/'.$this->packages[0].'/autoload.local.php';
+        $packages = reset($this->packages);
+        $autoloadDistOriginal = $codeDirectory.'/'.$packages['directory'].'/autoload.local.php.dist';
+        $autoloadDistLocal = $codeDirectory.'/'.$packages['directory'].'/autoload.local.php';
         $this->copyAutoloadFile(
             $io,
             $autoloadDistOriginal,
             $autoloadDistLocal
         );
+    }
+
+    /**
+     * Finds all drupal console packages on the code directory.
+     *
+     * @param string $directory
+     *
+     * @return array List of packages.
+     */
+    protected function populatePackages($directory) {
+        $packages = array();
+        try {
+            $finder = new Finder();
+            $finder->files()
+                ->in($directory)
+                ->name('composer.json')
+                ->contains('drupal/')
+                ->depth('== 1')
+                ->ignoreUnreadableDirs();
+
+            foreach ($finder as $file) {
+                $contents = json_decode($file->getContents());
+                $packages[$contents->name]['path'] = $directory;
+                $packages[$contents->name]['directory'] = $file->getRelativePath();
+            }
+        } catch (\Exception $e) {
+            // Ommitting erros for now.
+        }
+
+        return $packages;
     }
 
     /**
