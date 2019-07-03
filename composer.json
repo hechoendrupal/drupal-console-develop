@@ -20,6 +20,6 @@
         "psr-4": {"Drupal\\Console\\Develop\\": "src"}
     },
     "require-dev": {
-        "drupal/console-core": "~1.0"
+        "drupal/console-core": "~1.9"
     }
 }

@@ -10,10 +10,10 @@ namespace Drupal\Console\Develop\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Command\Command;
 use Drupal\Console\Core\Style\DrupalStyle;
 use Drupal\Console\Core\Command\Shared\CommandTrait;
 use Drupal\Console\Annotations\DrupalCommand;
+use Drupal\Console\Core\Command\Command;
 
 /**
  * Class DevelopDocDataCommand.
@@ -27,7 +27,6 @@ use Drupal\Console\Annotations\DrupalCommand;
 class DevelopDocDataCommand extends Command
 {
     use CommandTrait;
-
 
     /**
      * {@inheritdoc}
@@ -60,7 +59,18 @@ class DevelopDocDataCommand extends Command
             $file = $input->getOption('file');
         }
 
-        $data = $this->getApplication()->getData();
+        $application = $this->getApplication();
+        $applicationData = $application->getData();
+        $namespaces = $applicationData['application']['namespaces'];
+
+        $data['language'] = $applicationData['default_language'];
+
+        foreach ($namespaces as $namespace) {
+            foreach ($applicationData['commands'][$namespace] as $command) {
+               $data['commands'][] = $command;
+            }
+        }
+
         if ($file) {
             file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
 
