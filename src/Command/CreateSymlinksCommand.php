@@ -41,6 +41,7 @@ class CreateSymlinksCommand extends Command
      */
     protected $packages = [
         'drupal-console',
+        'drupal-console-book',
         'drupal-console-core',
         'drupal-console-extend-plugin',
         'drupal-console-develop',
