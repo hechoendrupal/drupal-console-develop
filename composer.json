@@ -13,13 +13,19 @@
             "email": "enzos@weknowinc.com"
         }
     ],
-    "require": {},
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {"Drupal\\Console\\Develop\\": "src"}
     },
+    "extra": {
+        "class": "Drupal\\Console\\Develop\\Composer\\ConsoleDevelopPluginInterface"
+    },
+    "require": {
+        "composer-plugin-api": "^1.0"
+    },
     "require-dev": {
-        "drupal/console-core": "~1.0"
+        "drupal/console-core": "~1.0",
+        "composer/composer": "^1.9"
     }
 }
