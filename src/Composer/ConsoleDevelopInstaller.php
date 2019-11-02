@@ -29,7 +29,14 @@ class ConsoleDevelopInstaller extends LibraryInstaller
    */
   public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
   {
-    // TODO: Implement isInstalled() method.
+    if (!$repo->hasPackage($package)) {
+        return false;
+    }
+    $installPath = $this->getInstallPath($package);
+    if (is_readable($installPath)) {
+        return true;
+    }
+    return (Platform::isWindows() && $this->filesystem->isJunction($installPath)) || is_link($installPath);
   }
 
   /**
@@ -40,7 +47,17 @@ class ConsoleDevelopInstaller extends LibraryInstaller
    */
   public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
   {
-    // TODO: Implement install() method.
+    $this->initializeVendorDir();
+    $downloadPath = $this->getInstallPath($package);
+    // remove the binaries if it appears the package files are missing
+    if (!is_readable($downloadPath) && $repo->hasPackage($package)) {
+        $this->binaryInstaller->removeBinaries($package);
+    }
+    $this->installCode($package);
+    $this->binaryInstaller->installBinaries($package, $this->getInstallPath($package));
+    if (!$repo->hasPackage($package)) {
+        $repo->addPackage(clone $package);
+    }
   }
 
   /**
@@ -54,7 +71,17 @@ class ConsoleDevelopInstaller extends LibraryInstaller
    */
   public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
   {
-    // TODO: Implement update() method.
+    if (!$repo->hasPackage($initial)) {
+        throw new \InvalidArgumentException('Package is not installed: '.$initial);
+    }
+    $this->initializeVendorDir();
+    $this->binaryInstaller->removeBinaries($initial);
+    $this->updateCode($initial, $target);
+    $this->binaryInstaller->installBinaries($target, $this->getInstallPath($target));
+    $repo->removePackage($initial);
+    if (!$repo->hasPackage($target)) {
+        $repo->addPackage(clone $target);
+    }
   }
 
   /**
@@ -65,7 +92,19 @@ class ConsoleDevelopInstaller extends LibraryInstaller
    */
   public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
   {
-    // TODO: Implement uninstall() method.
+    if (!$repo->hasPackage($package)) {
+        throw new \InvalidArgumentException('Package is not installed: '.$package);
+    }
+    $this->removeCode($package);
+    $this->binaryInstaller->removeBinaries($package);
+    $repo->removePackage($package);
+    $downloadPath = $this->getPackageBasePath($package);
+    if (strpos($package->getName(), '/')) {
+        $packageVendorDir = dirname($downloadPath);
+        if (is_dir($packageVendorDir) && $this->filesystem->isDirEmpty($packageVendorDir)) {
+            Silencer::call('rmdir', $packageVendorDir);
+        }
+    }
   }
 
   /**
